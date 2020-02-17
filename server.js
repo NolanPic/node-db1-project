@@ -1,15 +1,13 @@
 const express = require('express');
 
-const db = require('./data/dbConfig.js');
+const db = require('./data/db');
 
 const server = express();
 
 server.use(express.json());
 
 server.get('/accounts', (req, res) => {
-    db()
-        .from('accounts')
-        .select('*')
+    db.get()
         .then(accounts => {
             res.status(200).json(accounts);
         })
@@ -22,7 +20,7 @@ server.get('/accounts', (req, res) => {
 server.get('/accounts/:id', (req, res) => {
     const { id } = req.params;
 
-    getById(id)
+    db.getById(id)
         .then(account => {
             res.status(200).json(account);
         })
@@ -35,10 +33,9 @@ server.get('/accounts/:id', (req, res) => {
 server.post('/accounts', (req, res) => {
     const account = req.body;
 
-    db('accounts')
-        .insert(account)
+    db.insert(account)
         .then(inserted => {
-            return getById(inserted[0])
+            return db.getById(inserted[0])
                 .then(newAccount => res.status(201).json(newAccount));
         })
         .catch(err => {
@@ -51,11 +48,9 @@ server.put('/accounts/:id', (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    db('accounts')
-        .where({ id })
-        .update(updates)
+    db.update(id, updates)
         .then(() => {
-            return getById(id)
+            return db.getById(id)
                 .then(updatedAccount => {
                     res.status(200).json(updatedAccount);
                 });
@@ -69,9 +64,7 @@ server.put('/accounts/:id', (req, res) => {
 server.delete('/accounts/:id', (req, res) => {
     const { id } = req.params;
 
-    db('accounts')
-        .where({ id })
-        .delete()
+    db.remove(id)
         .then(() => {
             res.status(204).send();
         })
@@ -82,11 +75,3 @@ server.delete('/accounts/:id', (req, res) => {
 });
 
 module.exports = server;
-
-function getById(id) {
-    return db()
-        .from('accounts')
-        .select('*')
-        .where('id', id)
-        .first();
-}
