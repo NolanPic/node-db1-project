@@ -47,6 +47,25 @@ server.post('/accounts', (req, res) => {
         });
 });
 
+server.put('/accounts/:id', (req, res) => {
+    const { id } = req.params;
+    const updates = req.body;
+
+    db('accounts')
+        .where({ id })
+        .update(updates)
+        .then(() => {
+            return getById(id)
+                .then(updatedAccount => {
+                    res.status(200).json(updatedAccount);
+                });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: "Something went wrong updating this account" });
+        });
+});
+
 module.exports = server;
 
 function getById(id) {
