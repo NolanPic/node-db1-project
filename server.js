@@ -8,7 +8,9 @@ const server = express();
 server.use(express.json());
 
 server.get('/accounts', (req, res) => {
-    db.get()
+    const { limit, sortby, sortdir } = req.query;
+
+    db.get(limit, sortby, sortdir)
         .then(accounts => {
             res.status(200).json(accounts);
         })

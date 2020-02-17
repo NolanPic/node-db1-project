@@ -8,10 +8,12 @@ module.exports = {
     remove
 };
 
-function get() {
+function get(limit = null, sortby = 'id', sortdir = 'asc') {
     return db()
         .from('accounts')
-        .select('*');
+        .select('*')
+        .orderBy(sortby, sortdir)
+        .limit(limit);
 }
 
 function getById(id) {
