@@ -1,6 +1,7 @@
 const express = require('express');
 
 const db = require('./data/db');
+const accountExists = require('./middleware/accountExists');
 
 const server = express();
 
@@ -17,17 +18,8 @@ server.get('/accounts', (req, res) => {
         });
 });
 
-server.get('/accounts/:id', (req, res) => {
-    const { id } = req.params;
-
-    db.getById(id)
-        .then(account => {
-            res.status(200).json(account);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({ error: "Something went wrong getting this account" });
-        });
+server.get('/accounts/:id', accountExists, (req, res) => {
+    res.status(200).json(req.account);
 });
 
 server.post('/accounts', (req, res) => {
@@ -44,7 +36,7 @@ server.post('/accounts', (req, res) => {
         });
 });
 
-server.put('/accounts/:id', (req, res) => {
+server.put('/accounts/:id', accountExists, (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
@@ -61,7 +53,7 @@ server.put('/accounts/:id', (req, res) => {
         });
 });
 
-server.delete('/accounts/:id', (req, res) => {
+server.delete('/accounts/:id', accountExists, (req, res) => {
     const { id } = req.params;
 
     db.remove(id)
