@@ -66,6 +66,21 @@ server.put('/accounts/:id', (req, res) => {
         });
 });
 
+server.delete('/accounts/:id', (req, res) => {
+    const { id } = req.params;
+
+    db('accounts')
+        .where({ id })
+        .delete()
+        .then(() => {
+            res.status(204).send();
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: "Something went wrong deleting this account" });
+        });
+});
+
 module.exports = server;
 
 function getById(id) {
